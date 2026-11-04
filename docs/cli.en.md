@@ -2,13 +2,13 @@
 
 [简体中文](cli.md) | English
 
-> Using Mika from a computer? Start with [Use Mika from a computer](computer.en.md): how to choose between CLI + Skill and MCP, and how to connect.
+> Using Vsion from a computer? Start with [Use Vsion from a computer](computer.en.md): how to choose between CLI + Skill and MCP, and how to connect.
 
-CLI and MCP are peer entry points backed by the same remote task service on the phone. The CLI calls an ordinary HTTP task API; it needs no MCP SDK, handshake, tool discovery or MCP client configuration. The Skill tells a computer agent how to delegate, handle questions and report actual results. Mika on Android still plans and executes the task.
+CLI and MCP are peer entry points backed by the same remote task service on the phone. The CLI calls an ordinary HTTP task API; it needs no MCP SDK, handshake, tool discovery or MCP client configuration. The Skill tells a computer agent how to delegate, handle questions and report actual results. Vsion on Android still plans and executes the task.
 
 ```mermaid
 flowchart LR
-    Skill["Computer agent + Skill"] --> CLI["Mika CLI"]
+    Skill["Computer agent + Skill"] --> CLI["Vsion CLI"]
     Shell["User / shell script"] --> CLI
     Client["MCP client"] --> MCP
     subgraph Phone["Android phone · shared listener and authentication"]
@@ -28,19 +28,19 @@ flowchart LR
 
 See the [CLI / Skill installation guide](computer-install.en.md) for installation, updates, rollback and removal. Normally choose either the CLI or MCP. The phone must support task API v1, first shipped in official APK v0.1.23.
 
-With only the Skill installed, `mika` below means `python3 <skills-directory>/mika/scripts/mika_cli.py` (`py -3` on Windows).
+With only the Skill installed, `vsion` below means `python3 <skills-directory>/vsion/scripts/vsion_cli.py` (`py -3` on Windows).
 
 ## Connect
 
-ADB mode requires Android platform-tools and either USB or connected wireless ADB. For wireless ADB, this computer must be paired and connected to the phone, which must appear as `device` in `adb devices`. Pairing Mika's built-in helper on the phone does not pair the computer; both also differ from direct LAN access below.
+ADB mode requires Android platform-tools and either USB or connected wireless ADB. For wireless ADB, this computer must be paired and connected to the phone, which must appear as `device` in `adb devices`. Pairing Vsion's built-in helper on the phone does not pair the computer; both also differ from direct LAN access below.
 
 ```bash
-mika devices --json
-mika connect --device SERIAL --json
-mika doctor --device SERIAL --json
+vsion devices --json
+vsion connect --device SERIAL --json
+vsion doctor --device SERIAL --json
 ```
 
-You may omit `--device` when exactly one device is online; the existing ANDROID_SERIAL environment variable is also supported. Multiple devices require a choice, and connection failure never selects a different phone. `connect` runs Mika's official bootstrap script to enable computer access and start the required helper; it does not submit a task. Other commands only read the current connection.
+You may omit `--device` when exactly one device is online; the existing ANDROID_SERIAL environment variable is also supported. Multiple devices require a choice, and connection failure never selects a different phone. `connect` runs Vsion's official bootstrap script to enable computer access and start the required helper; it does not submit a task. Other commands only read the current connection.
 
 Each invocation reads the current token, port and boot number, allocates its own temporary `adb forward tcp:0` mapping, then removes only that mapping. Tokens stay in process memory; bootstrap output is captured instead of printed. Exiting the CLI leaves the phone service and ongoing tasks running.
 
@@ -49,7 +49,7 @@ The CLI handles forwarding; you do not need the MCP instructions for manually fo
 For LAN/private-network access explicitly enabled in the phone's settings:
 
 ```bash
-mika --url http://PHONE:8765 --token-file /path/to/private-token-file doctor --json
+vsion --url http://PHONE:8765 --token-file /path/to/private-token-file doctor --json
 ```
 
 The private token file contains only the access token. Use the server origin or `/api/v1` URL, not `/mcp`; URL credentials are rejected. The CLI refuses redirects and ignores ambient HTTP proxies. The server retains its private-network restrictions. Plain LAN HTTP does not encrypt traffic; ADB or a trusted private network can be used.
@@ -57,13 +57,13 @@ The private token file contains only the access token. Use the server origin or 
 ## Tasks
 
 ```bash
-mika --device SERIAL task run --goal-file task.txt --json
-mika --device SERIAL task status TASK_ID --json
-mika --device SERIAL task wait TASK_ID --timeout 45 --json
-mika --device SERIAL task answer TASK_ID --text-file answer.txt --json
-mika --device SERIAL task steer TASK_ID --text "Only summarize today's messages" --json
-mika --device SERIAL task cancel TASK_ID --json
-mika --device SERIAL task list --limit 10 --json
+vsion --device SERIAL task run --goal-file task.txt --json
+vsion --device SERIAL task status TASK_ID --json
+vsion --device SERIAL task wait TASK_ID --timeout 45 --json
+vsion --device SERIAL task answer TASK_ID --text-file answer.txt --json
+vsion --device SERIAL task steer TASK_ID --text "Only summarize today's messages" --json
+vsion --device SERIAL task cancel TASK_ID --json
+vsion --device SERIAL task list --limit 10 --json
 ```
 
 Use `--goal` / `--text` for simple text, or UTF-8 files for multiline input. A file argument of `-` reads stdin. `run --conversation CONVERSATION_ID` starts another task in an existing remote conversation; `answer` only answers an open question. Existing mcp- conversation IDs remain valid across both interfaces. Their historical prefix does not mean the CLI uses MCP.
@@ -84,7 +84,7 @@ Queued, paused, question-waiting, phone-handoff and terminal tasks reject steeri
 | 4 | Write outcome unknown; the phone may have accepted it, and it was not retried. |
 | 130 | A local read/wait was interrupted; no phone task cancellation was requested. |
 
-On a phone advertising `task_recovery`, the CLI generates a lowercase UUID before submitting and the phone records it before starting the task. For automation, save your own UUID first and pass it to `task run --request-id UUID --goal ...`. A lost receipt returns exit 4 with the `task_id`. Reconnect to the same phone and run `mika task status UUID`. If the phone still returns 404 and you intend to retry, use the same ID, goal and conversation argument. A replay returns the existing task. Reusing the ID for a different request returns 409. The CLI never automatically resends a write.
+On a phone advertising `task_recovery`, the CLI generates a lowercase UUID before submitting and the phone records it before starting the task. For automation, save your own UUID first and pass it to `task run --request-id UUID --goal ...`. A lost receipt returns exit 4 with the `task_id`. Reconnect to the same phone and run `vsion task status UUID`. If the phone still returns 404 and you intend to retry, use the same ID, goal and conversation argument. A replay returns the existing task. Reusing the ID for a different request returns 409. The CLI never automatically resends a write.
 
 After an app process restart the same ID retrieves the answer and verification fields, failure reason or cancellation. An unfinished task returns `failed` with `failure_kind=interrupted`. Deleting a conversation clears its remote task contents. Its used IDs return 410 and cannot start tasks again. Finished task records are kept for 30 days, up to the latest 1000; after that the same ID counts as a new request. IDs held only in memory before upgrading cannot be reconstructed. Ordinary submissions still work on older phones with the previous recent-task lookup. An explicit `--request-id` requires a compatible phone.
 
@@ -93,11 +93,11 @@ After an app process restart the same ID retrieves the answer and verification f
 ## Browser task desk
 
 ```bash
-mika ui                      # open the task desk in a local browser
-mika ui --device SERIAL --no-open
+vsion ui                      # open the task desk in a local browser
+vsion ui --device SERIAL --no-open
 ```
 
-`mika ui` serves a page for this computer only on a random `127.0.0.1` port. It uses the same task commands to start tasks, follow progress, answer questions, add instructions and cancel, and shows Simplified Chinese or English depending on the browser's language. The part of the link after `#` is the session secret for this run; browsers do not send it anywhere. The server also checks Host and Origin and accepts only a fixed set of actions. It is an interactive page for people and does not support `--json`. See [Use Mika from a computer](computer.en.md#task-desk-mika-ui).
+`vsion ui` serves a page for this computer only on a random `127.0.0.1` port. It uses the same task commands to start tasks, follow progress, answer questions, add instructions and cancel, and shows Simplified Chinese or English depending on the browser's language. The part of the link after `#` is the session secret for this run; browsers do not send it anywhere. The server also checks Host and Origin and accepts only a fixed set of actions. It is an interactive page for people and does not support `--json`. See [Use Vsion from a computer](computer.en.md#task-desk-vsion-ui).
 
 ## HTTP contract
 
@@ -121,8 +121,8 @@ Business validation errors return 400, missing tasks 404, answers incompatible w
 
 ```bash
 ./gradlew :core:test :core:cliTest :app:testDebugUnitTest :app:assembleDebug
-# Python tests alone; use -PmikaPython=/path/to/python3 to select an interpreter
-python3 -m unittest discover -s tools/mika/tests -v
+# Python tests alone; use -PvsionPython=/path/to/python3 to select an interpreter
+python3 -m unittest discover -s tools/vsion/tests -v
 ```
 
 Pure JVM tests cover the shared service, API/MCP interoperability, authentication, states and existing protocol regressions. `cliTest` (needs Python 3.10+; not part of `check`, run it explicitly) runs the real CLI against the Kotlin HTTP server, checking it only requests `/api/v1`, plus fake-ADB, lost-response, token-rotation, forwarding-cleanup and standalone-Skill tests. No phone or model key is required. Actual wireless disconnects, phone reboot and real agent execution need separate device acceptance; isolated tests do not establish those results.

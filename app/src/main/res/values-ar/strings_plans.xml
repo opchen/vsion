@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="trigger_reminder">تذكير Mika</string>
+    <string name="trigger_reminder">تذكير Vsion</string>
     <string name="trigger_not_started_body">تعذر بدء مهمة مجدولة. تحقق منها في صفحة «المهام المجدولة» وشغّلها مجددًا.</string>
     <string name="trigger_start_failed">تعذر البدء</string>
     <string name="trigger_not_started">لم تبدأ المهمة المجدولة</string>
-    <string name="trigger_interrupted_body">توقفت مهمة مجدولة، ولا يمكن تأكيد نتيجتها. تحقق أولًا مما حدث فعليًا؛ لن تكررها Mika تلقائيًا.</string>
+    <string name="trigger_interrupted_body">توقفت مهمة مجدولة، ولا يمكن تأكيد نتيجتها. تحقق أولًا مما حدث فعليًا؛ لن تكررها Vsion تلقائيًا.</string>
     <string name="trigger_unconfirmed">يجب التحقق من نتيجة المهمة المجدولة</string>
     <string name="trigger_alarm_title">تحتاج المهام المجدولة إلى إذن «المنبهات والتذكيرات»</string>
     <string name="trigger_alarm_body">من دون هذا الإذن، قد تتأخر المهام المجدولة أو لا تعمل إطلاقًا. انقر هنا لتفعيله.</string>
@@ -12,7 +12,7 @@
     <string name="plans_alarm_body">من دون هذا الإذن، قد تتأخر المهام المجدولة أو لا تعمل إطلاقًا. لا يلزم تفعيله إلا مرة واحدة.</string>
     <string name="plans_running_n">نشطة %1$d</string>
     <string name="plans_stopped_n">متوقفة %1$d</string>
-    <string name="plans_empty">لا توجد مهام مجدولة بعد\nأخبر Mika في محادثة بموعد تذكيرك أو بعمل شيء من أجلك.</string>
+    <string name="plans_empty">لا توجد مهام مجدولة بعد\nأخبر Vsion في محادثة بموعد تذكيرك أو بعمل شيء من أجلك.</string>
     <string name="plans_none_running">لا توجد مهام مجدولة نشطة</string>
     <string name="plans_none_stopped">لا توجد مهام مجدولة متوقفة</string>
     <string name="plans_footer">يمكنك أيضًا إنشاء مهمة بقول «كل يوم عند الثامنة…» أو «أخبرني عندما ينخفض السعر» في محادثة؛ وستعود النتائج إلى تلك المحادثة. قد تتأثر المهام المحددة بوقت بتوفير البطارية؛ ولا يؤثر إيقاف المهمة أو حذفها إلا في عمليات التشغيل المستقبلية.</string>
